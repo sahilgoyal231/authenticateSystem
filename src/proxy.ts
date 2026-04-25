@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server'
 export function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname
 
-  const isPublicPath = path === '/login' || path === '/signup' || path === '/verifyEmail'
+  const isPublicPath = path === '/login' || path === '/signup' || path === '/verifyEmail' || path === '/forgotPassword' || path === '/resetPassword'
 
   const token = request.cookies.get('token')?.value || "";
 
@@ -23,6 +23,8 @@ export const config = {
     '/profile/:path*',
     '/login',
     '/signup',
-    '/verifyEmail'
+    '/verifyEmail',
+    '/forgotPassword',
+    '/resetPassword'
   ]
 }
