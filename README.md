@@ -1,511 +1,297 @@
-<![CDATA[<div align="center">
-
 # 🔐 AuthentiKit
 
-### A Full-Stack Authentication System Built with Next.js 16
+> A full-stack authentication system built with **Next.js 16**, **MongoDB**, and **TypeScript** — featuring JWT-based login, email verification, route protection, and profile management.
 
-[![Next.js](https://img.shields.io/badge/Next.js-16.2.4-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19.2.4-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-
----
-
-**A production-ready, secure authentication starter kit featuring user registration, JWT-based login, email verification, route protection, and profile management — all wired together with Next.js App Router and MongoDB.**
-
-[Getting Started](#-getting-started) •
-[Architecture](#-architecture) •
-[API Reference](#-api-reference) •
-[Features](#-features) •
-[Project Structure](#-project-structure)
-
-</div>
+[![Next.js](https://img.shields.io/badge/Next.js-16.2.4-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.2.4-61DAFB?style=flat-square&logo=react)](https://react.dev/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=flat-square&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.x-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 
 ---
 
-## ✨ Features
+## Table of Contents
 
-| Feature | Description |
-|---|---|
-| 🧾 **User Registration** | Sign up with username, email, and password — with duplicate-user detection |
-| 🔑 **Secure Login** | JWT-based authentication with HTTP-only cookie storage |
-| 📧 **Email Verification** | Token-based email verification flow via Mailtrap SMTP |
-| 🛡️ **Route Protection** | Middleware-driven access control for public and private routes |
-| 👤 **Profile Management** | View authenticated user details and dynamic user profile pages |
-| 🚪 **Logout** | Secure session termination by clearing HTTP-only cookies |
-| 🔒 **Password Hashing** | Industry-standard bcrypt hashing with configurable salt rounds |
-| ⏱️ **Token Expiry** | Verification and password-reset tokens auto-expire after 1 hour |
-
----
-
-## 🏗️ Architecture
-
-```
-┌──────────────────────────────────────────────────────────────────────┐
-│                          CLIENT (Browser)                           │
-│                                                                     │
-│  ┌──────────┐   ┌──────────┐   ┌─────────────┐   ┌──────────────┐  │
-│  │  Signup   │   │  Login   │   │ Verify Email│   │   Profile    │  │
-│  │  Page     │   │  Page    │   │    Page     │   │    Page      │  │
-│  └─────┬────┘   └─────┬────┘   └──────┬──────┘   └──────┬───────┘  │
-│        │              │               │                  │          │
-└────────┼──────────────┼───────────────┼──────────────────┼──────────┘
-         │              │               │                  │
-         ▼              ▼               ▼                  ▼
-┌──────────────────────────────────────────────────────────────────────┐
-│                     MIDDLEWARE (Route Guard)                         │
-│                                                                     │
-│   • Public routes:  /login, /signup, /verifyEmail                   │
-│   • Protected:      /, /profile/*                                   │
-│   • Redirects authenticated users away from public pages            │
-│   • Redirects unauthenticated users to /login                       │
-└────────────────────────────┬─────────────────────────────────────────┘
-                             │
-                             ▼
-┌──────────────────────────────────────────────────────────────────────┐
-│                     API ROUTES (Next.js App Router)                  │
-│                                                                     │
-│   POST  /api/users/signup       → Register new user + send email    │
-│   POST  /api/users/login        → Authenticate + issue JWT cookie   │
-│   GET   /api/users/logout       → Clear JWT cookie                  │
-│   GET   /api/users/myData       → Return current user (from token)  │
-│   POST  /api/users/verifyEmail  → Verify email token                │
-└────────────────────────────┬─────────────────────────────────────────┘
-                             │
-                             ▼
-┌──────────────────────────────────────────────────────────────────────┐
-│                     DATA LAYER                                      │
-│                                                                     │
-│   ┌───────────────┐    ┌────────────────┐    ┌──────────────────┐   │
-│   │   Mongoose     │    │   bcryptjs     │    │   jsonwebtoken   │   │
-│   │   (MongoDB)    │    │   (Hashing)    │    │   (JWT Auth)     │   │
-│   └───────┬───────┘    └────────────────┘    └──────────────────┘   │
-│           │                                                         │
-│           ▼                                                         │
-│   ┌───────────────┐    ┌────────────────────────────────────────┐   │
-│   │ MongoDB Atlas  │    │  Mailtrap (Email Sandbox / SMTP)      │   │
-│   │   Cluster      │    │  → Verification & Password Reset      │   │
-│   └───────────────┘    └────────────────────────────────────────┘   │
-└──────────────────────────────────────────────────────────────────────┘
-```
+1. [Features](#features)
+2. [Tech Stack](#tech-stack)
+3. [Getting Started](#getting-started)
+4. [Project Structure](#project-structure)
+5. [How Authentication Works](#how-authentication-works)
+6. [API Reference](#api-reference)
+7. [Database Schema](#database-schema)
+8. [Route Protection](#route-protection)
+9. [Security](#security)
+10. [Contributing](#contributing)
+11. [License](#license)
 
 ---
 
-## 🔄 Authentication Flow
+## Features
 
-```
-    ┌────────┐          ┌────────┐          ┌────────┐         ┌──────────┐
-    │  User  │          │ Server │          │ MongoDB│         │ Mailtrap │
-    └───┬────┘          └───┬────┘          └───┬────┘         └────┬─────┘
-        │                   │                   │                   │
-        │  1. POST /signup  │                   │                   │
-        │──────────────────>│                   │                   │
-        │                   │  2. Check if      │                   │
-        │                   │     user exists    │                   │
-        │                   │──────────────────>│                   │
-        │                   │  3. Hash password  │                   │
-        │                   │  4. Save user      │                   │
-        │                   │──────────────────>│                   │
-        │                   │  5. Send verify    │                   │
-        │                   │     email          │                   │
-        │                   │──────────────────────────────────────>│
-        │  6. Success       │                   │                   │
-        │<──────────────────│                   │                   │
-        │                   │                   │                   │
-        │  7. Click email   │                   │                   │
-        │     verify link   │                   │                   │
-        │──────────────────>│                   │                   │
-        │                   │  8. Validate token │                   │
-        │                   │──────────────────>│                   │
-        │                   │  9. Set isVerified │                   │
-        │                   │──────────────────>│                   │
-        │  10. Verified! ✅  │                   │                   │
-        │<──────────────────│                   │                   │
-        │                   │                   │                   │
-        │  11. POST /login  │                   │                   │
-        │──────────────────>│                   │                   │
-        │                   │  12. Validate      │                   │
-        │                   │      credentials   │                   │
-        │                   │──────────────────>│                   │
-        │                   │  13. Sign JWT      │                   │
-        │  14. Set cookie 🍪│                   │                   │
-        │<──────────────────│                   │                   │
-        │                   │                   │                   │
-    ┌───┴────┐          ┌───┴────┐          ┌───┴────┐         ┌────┴─────┐
-    │  User  │          │ Server │          │ MongoDB│         │ Mailtrap │
-    └────────┘          └────────┘          └────────┘         └──────────┘
-```
+- **User Registration** — Sign up with username, email, and password (with duplicate detection)
+- **Secure Login** — JWT authentication stored in HTTP-only cookies
+- **Email Verification** — Token-based flow via Mailtrap SMTP with 1-hour expiry
+- **Route Protection** — Middleware guards that redirect based on auth state
+- **Profile Management** — View user details and dynamic profile pages
+- **Secure Logout** — Session termination by clearing HTTP-only cookies
+- **Password Hashing** — bcrypt with 10 salt rounds (raw passwords never stored)
 
 ---
 
-## 📁 Project Structure
+## Tech Stack
 
-```
-nextjs-project1/
-│
-├── 📄 package.json                 # Dependencies & scripts
-├── 📄 next.config.ts               # Next.js configuration
-├── 📄 tsconfig.json                # TypeScript configuration
-├── 📄 postcss.config.mjs           # PostCSS (Tailwind) config
-├── 📄 eslint.config.mjs            # ESLint configuration
-├── 📄 .env                         # Environment variables (⚠️ do not commit)
-├── 📄 .gitignore                   # Git ignore rules
-│
-├── 📂 public/                      # Static assets (SVGs, favicon)
-│
-└── 📂 src/
-    │
-    ├── 📂 app/                     # Next.js App Router
-    │   ├── 📄 layout.tsx           # Root layout (Geist fonts, global CSS)
-    │   ├── 📄 page.tsx             # Home / landing page
-    │   ├── 📄 globals.css          # Global Tailwind styles
-    │   │
-    │   ├── 📂 signup/
-    │   │   └── 📄 page.tsx         # User registration form
-    │   │
-    │   ├── 📂 login/
-    │   │   └── 📄 page.tsx         # User login form
-    │   │
-    │   ├── 📂 profile/
-    │   │   ├── 📄 page.tsx         # Profile dashboard (logout, fetch user)
-    │   │   └── 📂 [id]/
-    │   │       └── 📄 page.tsx     # Dynamic user profile page
-    │   │
-    │   ├── 📂 verifyEmail/
-    │   │   └── 📄 page.tsx         # Email verification handler
-    │   │
-    │   └── 📂 api/users/           # RESTful API routes
-    │       ├── 📂 signup/
-    │       │   └── 📄 route.ts     # POST — register user
-    │       ├── 📂 login/
-    │       │   └── 📄 route.ts     # POST — authenticate user
-    │       ├── 📂 logout/
-    │       │   └── 📄 route.ts     # GET  — clear session
-    │       ├── 📂 myData/
-    │       │   └── 📄 route.ts     # GET  — get current user
-    │       └── 📂 verifyEmail/
-    │           └── 📄 route.ts     # POST — verify email token
-    │
-    ├── 📂 dbConfig/
-    │   └── 📄 dbConfig.ts          # MongoDB connection singleton
-    │
-    ├── 📂 helpers/
-    │   ├── 📄 mailer.ts            # Nodemailer email utility (Mailtrap)
-    │   └── 📄 getDataFromToken.ts  # JWT token decoder helper
-    │
-    ├── 📂 models/
-    │   └── 📄 userModel.js         # Mongoose User schema & model
-    │
-    └── 📄 proxy.ts                 # Middleware — route guard logic
-```
+| Category | Technology | Purpose |
+|----------|-----------|---------|
+| Framework | Next.js 16 (App Router) | Full-stack React with API routes & middleware |
+| Language | TypeScript 5 | End-to-end type safety |
+| Styling | Tailwind CSS 4 | Utility-first CSS |
+| Database | MongoDB Atlas + Mongoose 9 | Document store with ODM |
+| Auth | jsonwebtoken + bcryptjs | JWT tokens & password hashing |
+| Email | Nodemailer + Mailtrap | Transactional email with sandbox testing |
+| HTTP | Axios | Client-side API calls |
+| UX | react-hot-toast | Toast notifications |
+| Fonts | Geist Sans & Geist Mono | Vercel's typeface family |
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
-Make sure you have the following installed:
+- [Node.js](https://nodejs.org/) ≥ 18.x
+- [MongoDB Atlas](https://www.mongodb.com/atlas) account (free tier works)
+- [Mailtrap](https://mailtrap.io/) account (free tier works)
 
-| Tool | Version | Purpose |
-|------|---------|---------|
-| [Node.js](https://nodejs.org/) | ≥ 18.x | JavaScript runtime |
-| [npm](https://www.npmjs.com/) | ≥ 9.x | Package manager |
-| [MongoDB Atlas](https://www.mongodb.com/atlas) | — | Cloud database |
-| [Mailtrap](https://mailtrap.io/) | — | Email testing sandbox |
-
-### 1. Clone the repository
+### Installation
 
 ```bash
+# 1. Clone the repo
 git clone https://github.com/your-username/nextjs-project1.git
 cd nextjs-project1
-```
 
-### 2. Install dependencies
-
-```bash
+# 2. Install dependencies
 npm install
+
+# 3. Create your environment file
+cp .env.example .env
 ```
 
-### 3. Configure environment variables
+### Environment Variables
 
-Create a `.env` file in the project root:
+Create a `.env` file in the project root with:
 
 ```env
-# ─── Database ──────────────────────────────────────────
-MONGO_URI="mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/<dbname>"
-
-# ─── Auth ──────────────────────────────────────────────
-TOKEN_SECRET="your-super-secret-jwt-signing-key"
-
-# ─── App ───────────────────────────────────────────────
+MONGO_URI="mongodb+srv://<user>:<pass>@cluster0.xxxxx.mongodb.net/<dbname>"
+TOKEN_SECRET="your-jwt-signing-secret"
 DOMAIN=http://localhost:3000
-
-# ─── Email (Mailtrap) ─────────────────────────────────
 MAILTRAP_USER="your-mailtrap-user"
 MAILTRAP_PASS="your-mailtrap-pass"
 ```
 
-> [!IMPORTANT]
-> Never commit your `.env` file to version control. The `.gitignore` already excludes it.
+> **⚠️ Do not commit `.env` to version control.** It's already in `.gitignore`.
 
-### 4. Run the development server
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser — the middleware will redirect you to `/login` if you're not authenticated.
-
-### 5. Build for production
+### Run
 
 ```bash
-npm run build
-npm start
+npm run dev       # Development server at http://localhost:3000
+npm run build     # Production build
+npm start         # Serve production build
+npm run lint      # Lint the codebase
 ```
 
 ---
 
-## 📡 API Reference
+## Project Structure
 
-### `POST /api/users/signup`
-
-Register a new user account.
-
-**Request Body:**
-```json
-{
-  "username": "johndoe",
-  "email": "john@example.com",
-  "password": "securepassword123"
-}
 ```
-
-**Success Response** `200`:
-```json
-{
-  "message": "User created successfully",
-  "success": true,
-  "savedUser": { ... }
-}
-```
-
-**Error Response** `400`:
-```json
-{
-  "error": "User already exists"
-}
-```
-
----
-
-### `POST /api/users/login`
-
-Authenticate a user and receive an HTTP-only JWT cookie.
-
-**Request Body:**
-```json
-{
-  "email": "john@example.com",
-  "password": "securepassword123"
-}
-```
-
-**Success Response** `200`:
-```json
-{
-  "message": "Login successful",
-  "success": true
-}
-```
-> Sets an `httpOnly` cookie named `token` with a **1-day expiry**.
-
-**Error Responses:**
-| Status | Message |
-|--------|---------|
-| `400` | `User does not exists` |
-| `400` | `Invalid password` |
-
----
-
-### `GET /api/users/logout`
-
-Terminate the user session by clearing the JWT cookie.
-
-**Success Response** `200`:
-```json
-{
-  "message": "Logout successful",
-  "success": true
-}
+src/
+├── app/                          # Next.js App Router
+│   ├── layout.tsx                # Root layout (fonts, global CSS)
+│   ├── page.tsx                  # Home page
+│   ├── globals.css               # Global styles
+│   │
+│   ├── signup/page.tsx           # Registration form
+│   ├── login/page.tsx            # Login form
+│   ├── verifyEmail/page.tsx      # Email verification handler
+│   │
+│   ├── profile/
+│   │   ├── page.tsx              # Profile dashboard
+│   │   └── [id]/page.tsx         # Dynamic user profile
+│   │
+│   └── api/users/                # REST API routes
+│       ├── signup/route.ts       # POST — register user
+│       ├── login/route.ts        # POST — authenticate & issue JWT
+│       ├── logout/route.ts       # GET  — clear session cookie
+│       ├── myData/route.ts       # GET  — fetch current user
+│       └── verifyEmail/route.ts  # POST — verify email token
+│
+├── dbConfig/
+│   └── dbConfig.ts               # MongoDB connection (singleton)
+│
+├── helpers/
+│   ├── mailer.ts                 # Email sender (Nodemailer + Mailtrap)
+│   └── getDataFromToken.ts       # JWT decoder utility
+│
+├── models/
+│   └── userModel.js              # Mongoose User schema
+│
+└── proxy.ts                      # Middleware — route guard logic
 ```
 
 ---
 
-### `GET /api/users/myData`
+## How Authentication Works
 
-Retrieve the authenticated user's profile (requires valid JWT cookie).
+The system follows a standard JWT-based flow:
 
-**Success Response** `200`:
-```json
-{
-  "message": "User found",
-  "data": {
-    "_id": "...",
-    "username": "johndoe",
-    "email": "john@example.com",
-    "isVerified": true,
-    "isAdmin": false
-  }
-}
-```
-> ⚠️ The `password` field is automatically excluded from the response.
+### 1. Sign Up
+User submits username, email, and password → server hashes the password with bcrypt → saves the user to MongoDB → sends a verification email with a hashed token link.
 
----
+### 2. Verify Email
+User clicks the link in their email → the token is matched against the database → if valid and not expired (1h window), `isVerified` is set to `true`.
 
-### `POST /api/users/verifyEmail`
+### 3. Log In
+User submits email and password → server fetches the user, compares the bcrypt hash → if valid, signs a JWT containing `{ id, username, email }` → stores it in an `httpOnly` cookie with 24h expiry.
 
-Verify a user's email address using the token sent via email.
+### 4. Access Protected Pages
+Every request passes through the middleware (`proxy.ts`). If the user has no valid token cookie and tries to access a protected route, they're redirected to `/login`. If they're already logged in and visit `/login` or `/signup`, they're sent to `/`.
 
-**Request Body:**
-```json
-{
-  "token": "hashed-verification-token"
-}
-```
-
-**Success Response** `200`:
-```json
-{
-  "message": "Email verified successfully",
-  "success": true
-}
-```
-
-**Error Response** `400`:
-```json
-{
-  "error": "Invalid token"
-}
-```
+### 5. Log Out
+The server responds with an expired cookie, clearing the JWT from the browser.
 
 ---
 
-## 🗃️ Database Schema
+## API Reference
 
-### User Model
-
-```javascript
-{
-  username:                 String   // required, unique
-  email:                    String   // required, unique
-  password:                 String   // required (bcrypt hashed)
-  isVerified:               Boolean  // default: false
-  isAdmin:                  Boolean  // default: false
-  forgotPasswordToken:      String   // optional — for password reset
-  forgotPasswordTokenExpiry: Date    // auto-expires after 1 hour
-  verifyToken:              String   // optional — for email verification
-  verifyTokenExpiry:        Date     // auto-expires after 1 hour
-}
-```
-
----
-
-## 🛡️ Security Features
-
-| Layer | Implementation |
-|-------|---------------|
-| **Password Storage** | Hashed with `bcryptjs` (10 salt rounds) — raw passwords are never stored |
-| **Session Management** | JWT stored in `httpOnly` cookies — immune to XSS-based token theft |
-| **Token Expiry** | Login tokens expire in 24 hours; verification tokens expire in 1 hour |
-| **Route Protection** | Middleware intercepts every request — unauthenticated users cannot access protected pages |
-| **Duplicate Prevention** | Email uniqueness enforced at both the schema and API level |
-| **Hot-Reload Safety** | Mongoose model is checked for existence before creation to avoid OverwriteModelError |
-
----
-
-## 🛠️ Tech Stack
-
-| Category | Technology | Why |
-|----------|-----------|-----|
-| **Framework** | Next.js 16 (App Router) | Full-stack React with server components, API routes, and middleware |
-| **Language** | TypeScript 5 | Type safety across the entire codebase |
-| **UI** | React 19 + Tailwind CSS 4 | Modern component model with utility-first styling |
-| **Database** | MongoDB Atlas + Mongoose 9 | Flexible document store with elegant ODM |
-| **Auth** | jsonwebtoken + bcryptjs | Industry-standard JWT auth and password hashing |
-| **Email** | Nodemailer + Mailtrap | Transactional emails with safe sandbox testing |
-| **HTTP Client** | Axios | Promise-based HTTP for client-side API calls |
-| **Notifications** | react-hot-toast | Beautiful toast notifications for user feedback |
-| **Fonts** | Geist Sans & Geist Mono | Vercel's premium typeface family |
-
----
-
-## 🧭 Route Map
+### Register User
 
 ```
-                        ┌──────────────────┐
-                        │   / (Home Page)  │
-                        │   🔒 Protected   │
-                        └────────┬─────────┘
-                                 │
-              ┌──────────────────┼──────────────────┐
-              │                  │                  │
-              ▼                  ▼                  ▼
-    ┌─────────────────┐ ┌──────────────┐  ┌─────────────────┐
-    │  /login          │ │  /signup      │  │  /profile       │
-    │  🌐 Public       │ │  🌐 Public    │  │  🔒 Protected   │
-    └────────┬────────┘ └──────┬───────┘  └────────┬────────┘
-             │                 │                   │
-             │                 │                   ▼
-             │                 │          ┌─────────────────┐
-             │                 │          │  /profile/[id]  │
-             │                 │          │  🔒 Protected   │
-             │                 │          └─────────────────┘
-             │                 │
-             ▼                 ▼
-    ┌──────────────────────────────────┐
-    │      /verifyEmail?token=xxx      │
-    │      🌐 Public                   │
-    └──────────────────────────────────┘
+POST /api/users/signup
 ```
 
----
+| Field | Type | Required |
+|-------|------|----------|
+| `username` | string | ✅ |
+| `email` | string | ✅ |
+| `password` | string | ✅ |
 
-## 📋 Available Scripts
-
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start development server with hot-reload |
-| `npm run build` | Create optimized production build |
-| `npm start` | Serve the production build |
-| `npm run lint` | Run ESLint to check code quality |
+**200** — `{ message: "User created successfully", success: true, savedUser: {...} }`
+**400** — `{ error: "User already exists" }`
 
 ---
 
-## 🤝 Contributing
+### Login
 
-Contributions are welcome! Here's how you can help:
+```
+POST /api/users/login
+```
 
-1. **Fork** the repository
-2. **Create** a feature branch: `git checkout -b feature/amazing-feature`
-3. **Commit** your changes: `git commit -m 'Add amazing feature'`
-4. **Push** to the branch: `git push origin feature/amazing-feature`
-5. **Open** a Pull Request
+| Field | Type | Required |
+|-------|------|----------|
+| `email` | string | ✅ |
+| `password` | string | ✅ |
 
----
-
-## 📜 License
-
-This project is open source and available under the [MIT License](LICENSE).
+**200** — `{ message: "Login successful", success: true }` + sets `token` cookie
+**400** — `{ error: "User does not exists" }` or `{ error: "Invalid password" }`
 
 ---
 
-<div align="center">
+### Logout
 
-**Built with ❤️ using Next.js, MongoDB & TypeScript**
+```
+GET /api/users/logout
+```
 
-*If this project helped you, consider giving it a ⭐*
+**200** — `{ message: "Logout successful", success: true }` + clears `token` cookie
 
-</div>
-]]>
+---
+
+### Get Current User
+
+```
+GET /api/users/myData
+```
+
+Requires valid JWT cookie. Returns user data **without the password field**.
+
+**200** — `{ message: "User found", data: { _id, username, email, isVerified, isAdmin } }`
+
+---
+
+### Verify Email
+
+```
+POST /api/users/verifyEmail
+```
+
+| Field | Type | Required |
+|-------|------|----------|
+| `token` | string | ✅ |
+
+**200** — `{ message: "Email verified successfully", success: true }`
+**400** — `{ error: "Invalid token" }`
+
+---
+
+## Database Schema
+
+**User** (`users` collection):
+
+| Field | Type | Default | Notes |
+|-------|------|---------|-------|
+| `username` | String | — | Required, unique |
+| `email` | String | — | Required, unique |
+| `password` | String | — | Required, bcrypt hashed |
+| `isVerified` | Boolean | `false` | Set to `true` after email verification |
+| `isAdmin` | Boolean | `false` | Admin flag |
+| `forgotPasswordToken` | String | — | For password reset flow |
+| `forgotPasswordTokenExpiry` | Date | — | Expires after 1 hour |
+| `verifyToken` | String | — | For email verification flow |
+| `verifyTokenExpiry` | Date | — | Expires after 1 hour |
+
+---
+
+## Route Protection
+
+The middleware in `proxy.ts` categorizes routes and controls access:
+
+| Route | Access | Behavior |
+|-------|--------|----------|
+| `/login` | 🌐 Public | Redirects to `/` if already logged in |
+| `/signup` | 🌐 Public | Redirects to `/` if already logged in |
+| `/verifyEmail` | 🌐 Public | Redirects to `/` if already logged in |
+| `/` | 🔒 Protected | Redirects to `/login` if not authenticated |
+| `/profile/*` | 🔒 Protected | Redirects to `/login` if not authenticated |
+
+---
+
+## Security
+
+| Concern | How it's handled |
+|---------|-----------------|
+| Password storage | Hashed with bcrypt (10 salt rounds) — plaintext never stored |
+| Token theft (XSS) | JWT is in an `httpOnly` cookie — inaccessible to JavaScript |
+| Session expiry | Login JWT expires in 24 hours |
+| Verification expiry | Email/reset tokens expire in 1 hour |
+| Duplicate accounts | Uniqueness enforced at schema + API level |
+| Hot-reload safety | Mongoose model existence check prevents `OverwriteModelError` |
+
+---
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch — `git checkout -b feature/your-feature`
+3. Commit your changes — `git commit -m 'Add your feature'`
+4. Push — `git push origin feature/your-feature`
+5. Open a Pull Request
+
+---
+
+## License
+
+This project is open source under the [MIT License](LICENSE).
+
+---
+
+<p align="center">Built with ❤️ using Next.js, MongoDB & TypeScript</p>
